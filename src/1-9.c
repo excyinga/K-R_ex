@@ -11,15 +11,15 @@ int main()
     char c, _state = TRUE;
     while ((c = getchar()) != EOF)
     {
-        if (c == ' ' && _state)
-        {
-            putchar(c);
-            _state = FALSE;
-        }
-        else if (c != ' ')
+        if (c != ' ')
         {
             putchar(c);
             _state = TRUE;
+        }
+        else if (_state)
+        {
+            putchar(c);
+            _state = FALSE;
         }
     }
     return 0;

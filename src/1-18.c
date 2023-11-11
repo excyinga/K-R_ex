@@ -1,11 +1,9 @@
 /* Write a program to remove trailing blanks and tabs from each line of input,
 and to delete entirely blank lines. */
 
-/* #include <stdio.h>
+#include <stdio.h>
 
 #define MAX_LINE 1024
-#define TRUE 1
-#define FALSE 0
 
 int GetLine(char [], int);
 void RemoveTrailingBlanks(char [], int);
@@ -16,7 +14,7 @@ int main()
     char line[MAX_LINE] = {0};
     while ((len = GetLine(line, MAX_LINE)))
     {
-        printf("Not edited line: \'%s\'\n");
+        printf("Not edited line: \'%s\'\n", line);
         RemoveTrailingBlanks(line, len);
         printf("Edited line: \'%s\'\n", line);
     }
@@ -38,10 +36,12 @@ int GetLine(char line[], int max)
 }
 void RemoveTrailingBlanks(char line[], int len)
 {
-    char _state = FALSE;
-    int ix, tmp;
-    for (ix = tmp = 0; line[ix] != '\0'; ix++)
+    int ix, tmp_ix;
+    for (ix = tmp_ix = 0; line[ix] != '\0'; ix++)
     {
-        
+        if (line[ix] != ' ' && line[ix] != '\t')
+            tmp_ix = ix + 1;
     }
-} */
+    line[tmp_ix] = '\0';
+    return;
+}
