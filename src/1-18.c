@@ -27,12 +27,11 @@ int GetLine(char line[], int max)
     int ix = 0;
     while (ix < max - 1 && (c = getchar()) != '\n' && c != EOF)
     {
-        if (ix < max - 1)
-            line[ix] = c;
+        line[ix] = c;
         ix++;
     }
     line[ix] = '\0';
-    return ix;
+    return ix; 
 }
 void RemoveTrailingBlanks(char line[], int len)
 {

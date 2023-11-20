@@ -14,8 +14,10 @@ int main()
     char line[MAX_LINE] = {0}, longest_line[MAX_LINE] = {0};
     while ((len = GetLine(line, MAX_LINE)) != 0)
     {
+        printf("Len: %d\n", len);
         if (len > max)
         {
+            printf("Copy line\n");
             max = len;
             CopyLine(line, longest_line);
         }
@@ -43,11 +45,7 @@ int GetLine(char line[], int max)
 void CopyLine(char from[], char to[])
 {
     int ix;
-    for (ix = 0; from[ix] != '\0'; ix++)
-    {
-        to[ix] = from[ix];
-    }
-    to[ix] = '\0';
+    for (ix = 0; (to[ix] = from[ix]) != '\0'; ix++);
     return;
 }
 

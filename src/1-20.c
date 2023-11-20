@@ -49,10 +49,9 @@ void Detab(void)
             int kx = TAB;
             while (kx <= jx)
                 kx = kx + TAB;
-            printf("%d\n", kx);
             for (; jx < kx; jx++)
                 new_line[jx] = ' ';
-            --jx; 
+            jx--; 
         }
         else
             new_line[jx] = line[ix];
