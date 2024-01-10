@@ -6,5 +6,6 @@ Experiment with leaving out parts of the program, to see what error messages you
 int main()
 {
     printf("Hello, world!\n");
+    
     return 0;
 }

@@ -6,7 +6,7 @@ and to delete entirely blank lines. */
 #define MAX_LINE 1024
 
 int GetLine(char [], int);
-void RemoveTrailingBlanks(char [], int);
+void RemoveTrailingBlanks(char []);
 
 int main()
 {
@@ -15,7 +15,7 @@ int main()
     while ((len = GetLine(line, MAX_LINE)))
     {
         printf("Not edited line: \'%s\'\n", line);
-        RemoveTrailingBlanks(line, len);
+        RemoveTrailingBlanks(line);
         printf("Edited line: \'%s\'\n", line);
     }
     return 0;
@@ -33,7 +33,7 @@ int GetLine(char line[], int max)
     line[ix] = '\0';
     return ix; 
 }
-void RemoveTrailingBlanks(char line[], int len)
+void RemoveTrailingBlanks(char line[])
 {
     int ix, tmp_ix;
     for (ix = tmp_ix = 0; line[ix] != '\0'; ix++)

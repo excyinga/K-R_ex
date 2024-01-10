@@ -4,26 +4,28 @@ Should n be a variable or a symbolic parameter? */
 
 #include <stdio.h>
 
+#define INIT 0
 #define TAB 8
 #define MAX_LINE 1024
+#define CH_TAB '\t'
+#define CH_BLANK ' '
 
-int len = 0;
-char line[MAX_LINE] = {0}, new_line[(MAX_LINE - 1) * TAB + 1] = {0};
+int len = INIT;
+char line[MAX_LINE], new_line[(MAX_LINE) * TAB + 1];
 
 int GetLine(char [], int);
 void Detab(void);
-void PrintLine(char []);
+void PrintLine(char arg[], char print_line[]);
 
 int main()
 {
     extern int len;
-    extern char line[];
-    extern char new_line[];
+    extern char line[], new_line[];
     while ((len = GetLine(line, MAX_LINE)))
     {
-        PrintLine(line);
+        PrintLine("Original line: ", line);
         Detab();
-        PrintLine(new_line);
+        PrintLine("Detabed line: ", new_line);
     }
     return 0;
 }
@@ -32,50 +34,60 @@ int GetLine(char line[], int max)
 {
     int ix;
     char c;
-    for (ix = 0; ix < max - 1 && (c = getchar()) != '\n' && c != EOF; ix++)
+    for (ix = INIT; ix < max - 1 && (c = getchar()) != '\n' && c != EOF; ix++)
         line[ix] = c;
     line[ix] = '\0';
     return ix;
 }
 void Detab(void)
 {
-    int ix, jx = ix = 0;
-    extern char line[];
-    extern char new_line[];
-    while (line[ix] != '\0')
+    extern char line[], new_line[];
+    int line_ix, new_line_ix = line_ix = INIT;
+    int boundary = TAB;
+    while (line[line_ix] != '\0')
     {
-        if (line[ix] == '\t')
+        if (line[line_ix] == CH_TAB)
         {
-            int kx = TAB;
-            while (kx <= jx)
-                kx = kx + TAB;
-            for (; jx < kx; jx++)
-                new_line[jx] = ' ';
-            jx--; 
+            /* Define an actual boundary */
+            while (boundary <= new_line_ix)
+                boundary = boundary + TAB;
+
+            for (; new_line_ix != boundary; new_line_ix++)
+                new_line[new_line_ix] = CH_BLANK;
         }
         else
-            new_line[jx] = line[ix];
-        ix++;
-        jx++;
+        {
+            new_line[new_line_ix] = line[line_ix];
+            new_line_ix++;
+        }
+        line_ix++;
     }
-    new_line[jx] = '\0';
+    new_line[new_line_ix] = '\0';
     return;
 }
-void PrintLine(char line[])
+void PrintLine(char arg[], char print_line[])
 { 
-    int ix = 0;
+    printf("%s", arg);
+    int ix = INIT;
+    int boundary = TAB;
     char c;
-    while (line[ix] != '\0')
+    while (print_line[ix] != '\0')
     {
-        if (line[ix] == '\t')
+        if (print_line[ix] == CH_TAB)
             c = 't';
-        else if (line[ix] == '\b')
+        else if (print_line[ix] == CH_BLANK)
             c = 'b';
         else 
-            c = line[ix];
-        putchar('\'');
+            c = print_line[ix];
         putchar(c);
-        putchar('\'');
+        
+        /* Printing actual boundary */
+        if (ix == boundary - 1 || print_line[ix] == CH_TAB)
+        {
+            boundary = boundary + TAB;
+            putchar('|');
+        } 
+    
         ix++;
     }
     putchar('\n');

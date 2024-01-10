@@ -1,5 +1,5 @@
 #!/bin/bash
 
 set -ex
-gcc -Wall -Werror -ansi -masm=intel -o app.bin src/$1.c
+gcc -Wall -ansi -masm=intel -O0 -o app.bin src/$1.c
 ./app.bin

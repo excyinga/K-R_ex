@@ -8,8 +8,10 @@ int ConvFahrToC(int);
 int main()
 {
     int ix;
+    
     for (ix = 0; ix <= 300; ix += 20)
         printf("%-4d %-3d\n", ix, ConvFahrToC(ix));
+    
     return 0;
 }
 

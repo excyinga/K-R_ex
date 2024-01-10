@@ -4,6 +4,7 @@
 
 int main()
 {
-    printf("%d\n", getchar() != EOF);
+    printf("Getchar expr: %d\n", getchar() != EOF);
+    
     return 0;
 }

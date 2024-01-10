@@ -6,6 +6,7 @@ int main()
 {
     int nl, nt, nb = nt = nl = 0;
     char c;
+    
     while ((c = getchar()) != EOF)
     {
         if (c == '\n')
@@ -15,6 +16,8 @@ int main()
         if (c == ' ')
             nb++;
     }
+    
     printf("\nnl: %d\nnt: %d\nnb: %d\n", nl, nt, nb);
+    
     return 0;
 }

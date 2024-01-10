@@ -8,34 +8,24 @@ likely to uncover bugs if there are any? */
 
 int main()
 {
-    char c, _state = IN;
+    char c, _state = OUT;
     int wc = 0;
+    
     while ((c = getchar()) != EOF)
     {
-        if (c == ' ' || c == '\t' || c == '\n')
-            _state = IN;
-        else if (_state)
+        if (c == ' ' || c == '\n' || c == '\t')
         {
-            wc++;
             _state = OUT;
         }
-    }
-    printf("wc: %d\n", wc);
-    return 0;
-}
-
-/* int main()
-{
-    char c;
-    int wc = 0;
-    while ((c = getchar()) != EOF)
-    {
-        if (c != '\n' && c != '\t' && c != ' ')
-        {
-            while ((c = getchar()) != '\n' && c != '\t' && c != ' ' && c != EOF);
+        else if (_state == OUT)
+        {   
             wc++;
+        
+            _state = IN;
         }
     }
+
     printf("wc: %d\n", wc);
+    
     return 0;
-} */ 
+}

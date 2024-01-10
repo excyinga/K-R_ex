@@ -2,27 +2,28 @@
 
 #include <stdio.h>
 
-#define IN 1
-#define OUT 0
+#define TRUE    1
+#define FALSE   0
 
 int main()
 {
-    char c, _state = OUT;
+    char c, _new_line = FALSE;
+    
     while ((c = getchar()) != EOF)
     {
-        if (c == '\n' || c == '\t' || c == ' ')
+        if (c != '\t' && c != ' ' && c != '\n')
         {
-            if (_state)
-            {
-                putchar('\n');
-                _state = OUT;
-            }
-        }
-        else
-        {
-            _state = IN;
             putchar(c);
+            
+            _new_line = TRUE;
+        }
+        else if (_new_line)
+        {
+            putchar('\n');
+            
+            _new_line = FALSE;
         }
     }
+    
     return 0;
 }

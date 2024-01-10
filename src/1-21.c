@@ -8,20 +8,17 @@ preference?  */
 #define INIT 0
 #define FALSE 0
 #define TRUE 1
-#define FLAG_CHR 0
-#define FLAG_BLK 1
-#define FLAG_TAB 2
 #define TAB 8
 #define MAX_LINE 1024
 #define CH_BLANK ' '
 #define CH_TAB '\t'
 
 int len = INIT;
-char line[MAX_LINE] = {INIT}, new_line[MAX_LINE] = {INIT};
+char line[MAX_LINE], new_line[MAX_LINE];
 
-int GetLine(char [], int);
+int GetLine(char line[], int max);
 void Entab(void);
-void PrintLine(char []);
+void PrintLine(char arg[], char print_line[]);
 
 int main()
 {
@@ -50,58 +47,23 @@ int GetLine(char line[], int max)
 }
 void Entab(void)
 {
-    int ix, jx, bx = jx = ix = INIT;
     extern char line[], new_line[];
-    while (line[ix] != '\0')
+    int line_ix, new_line_ix = line_ix = INIT;
+    
+    while (line[line_ix] != '\0')
     {
-        if (line[ix] == CH_BLANK || line[ix] == CH_TAB)
-        {
-            for (bx = ix; line[ix] == CH_BLANK || line[ix] == CH_TAB; ix++)
-            {
-                if (ix % TAB == TAB - 1 || line[ix] == CH_TAB)
-                {
-                    new_line[jx++] = CH_TAB;
-                    bx = ix + 1;
-                }
-                else if (line[ix + 1] != CH_BLANK && line[ix + 1] != CH_TAB)
-                {
-                    while (line[bx] == CH_BLANK)
-                    {
-                        new_line[jx++] = CH_BLANK;
-                        bx++;
-                    }
-                }
-            }
-            ix = ix - 1;
-        }
-        else
-        {
-            new_line[jx++] = line[ix];
-        }
-        ix++;
+        
     }
-    new_line[jx] = '\0';
-    return;
 
+    new_line[new_line_ix] = '\0';
+    return; 
 }
-void PrintLine(char line[])
+void PrintLine(char arg[], char print_line[]);
 { 
-    int ix = INIT;
-    char c;
-    while (line[ix] != '\0')
-    {
-        if (line[ix] == CH_TAB)
-            c = 't';
-        else if (line[ix] == CH_BLANK)
-            c = 'b';
-        else 
-            c = line[ix];
-        putchar('\'');
-        putchar(c);
-        putchar('\'');
-        ix++;
-    }
+    extern char new_line[];
+    
+
+
     putchar('\n');
     return;
 }
-       
