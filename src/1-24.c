@@ -1,7 +1,7 @@
 /* Write a program to check a C program for rudimentary syntax errors like
 unmatched parentheses, brackets and braces. Don't forget about quotes, both single and
 double, escape sequences, and comments. (This program is hard if you do it in full
-generality.) */ 
+generality.) */
 
 #include <stdio.h>
 
@@ -27,12 +27,34 @@ struct stack_t
 
 test_case test_cases[] =
 {
+    {"[]", TRUE},
+    {"[", FALSE},
+    {"{", FALSE},
+    {"(", FALSE},
+    {"]", FALSE},
+    {"}", FALSE},
+    {")", FALSE},
+    {"{}", TRUE},
+    {"()", TRUE},
+    {"[[]", FALSE},
+    {"([)]", FALSE},
+    {"{{(}}", FALSE},
+    {"{}}", FALSE},
+    {"(({))", FALSE},
+    {"((()))", TRUE},
+    {"({[][})]", FALSE},
+    {"{([(){{()[]}}])}", TRUE},
     {"int a[10]]", FALSE},
     {"float fun(){}", TRUE},
     {"[]{{int a;}}", TRUE},
-    {"/*asdsdas*/", TRUE},
-    {"/*/**/*/", FALSE},
-    {"/*/**/", TRUE}
+
+    {"/*safasdfasdfdsafasdfsadfasd*/", TRUE},
+    {"//*safasdf\nasdfdsafasdfsadfasd*/", FALSE},
+    {"( /* ) */", FALSE},
+    {"( /* ) */)", TRUE},
+    {"//asdfasdfasddsaf", FALSE},
+    {"/*aasdfadsfasd*/*/", FALSE}
+
 };
 
 void push(char element, stack_t * stack)
@@ -50,20 +72,54 @@ bool Validate(string test)
 {
     stack_t stack = {.sp = 0};
     int i = 0;
+    bool is_comment = FALSE;
     for(; test[i] != '\0'; i++)
     {
-        if (test[i] == '[')
+        if (!is_comment)
         {
-            push(test[i], &stack);
-        }
-        else if (test[i] == ']')
-        {
-            if (stack.sp == 0 || pop(&stack) != '[')
+            if (test[i] == '[' || test[i] == '{' || test[i] == '(')
             {
-                return FALSE;
+                push(test[i], &stack);
+            }
+            else if (test[i] == ']')
+            {
+                if (stack.sp == 0 || pop(&stack) != '[')
+                {
+                    return FALSE;
+                }
+            }
+            else if (test[i] == '}')
+            {
+                if (stack.sp == 0 || pop(&stack) != '{')
+                {
+                    return FALSE;
+                }
+            }
+            else if (test[i] == ')')
+            {
+                if (stack.sp == 0 || pop(&stack) != '(')
+                {
+                    return FALSE;
+                }
+            }
+            else if (test[i] == '/' && test[i + 1] == '*')
+            {
+                is_comment = TRUE;
+                i++;
+            }
+        }
+        else
+        {
+            if (test[i] == '*' && test[i + 1] == '/')
+            {
+                is_comment = FALSE;
+                i++;
             }
         }
     }
+
+    if (stack.sp != 0)
+        return FALSE;
     return TRUE;
 }
 
@@ -74,11 +130,11 @@ int main()
     {
         if (Validate(test_cases[i].test) == test_cases[i].is_passed)
         {
-            printf("Test #%d passed\n", i + 1);
+            printf("Test #%-2d passed\n", i + 1);
         }
         else
         {
-            printf("Test #%d didn't pass\n", i + 1);
+            printf("Test #%-2d didn't pass\n", i + 1);
         }
     }
     return 0;
