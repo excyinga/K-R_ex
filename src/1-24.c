@@ -7,7 +7,8 @@ generality.) */
 
 #define FALSE   0
 #define TRUE    1
-#define STACK_CAPACITY 16
+#define STACK_CAPACITY 64
+#define X(data, is_passed) {__LINE__, data, is_passed}
 
 typedef unsigned char bool;
 typedef char * string;
@@ -16,6 +17,7 @@ typedef struct stack_t stack_t;
 
 struct test_case
 {
+    int line;
     string test;
     bool is_passed;
 };
@@ -27,99 +29,176 @@ struct stack_t
 
 test_case test_cases[] =
 {
-    {"[]", TRUE},
-    {"[", FALSE},
-    {"{", FALSE},
-    {"(", FALSE},
-    {"]", FALSE},
-    {"}", FALSE},
-    {")", FALSE},
-    {"{}", TRUE},
-    {"()", TRUE},
-    {"[[]", FALSE},
-    {"([)]", FALSE},
-    {"{{(}}", FALSE},
-    {"{}}", FALSE},
-    {"(({))", FALSE},
-    {"((()))", TRUE},
-    {"({[][})]", FALSE},
-    {"{([(){{()[]}}])}", TRUE},
-    {"int a[10]]", FALSE},
-    {"float fun(){}", TRUE},
-    {"[]{{int a;}}", TRUE},
+    X("[]", TRUE),
+    X("[", FALSE),
+    X("{", FALSE),
+    X("(", FALSE),
+    X("]", FALSE),
+    X("}", FALSE),
+    X(")", FALSE),
+    X("))", FALSE),
+    X(")]", FALSE),
+    X("{)", FALSE),
+    X("{}", TRUE),
+    X("()", TRUE),
+    X("[[]", FALSE),
+    X("([)]", FALSE),
+    X("{{(}}", FALSE),
+    X("{}}", FALSE),
+    X("(({))", FALSE),
+    X("((()))", TRUE),
+    X("({[][})]", FALSE),
+    X("{([(){{()[]}}])}", TRUE),
+    X("int a[10]]", FALSE),
+    X("float fun(){}", TRUE),
+    X("[]{{int a;}}", TRUE),
+    X("{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}", TRUE),
+    X("{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}", TRUE),
+    X("{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}", FALSE),
+   
+    X("('(')", TRUE),
+    X("(''('')", FALSE),
+    X("('\"(\"')", TRUE),
+   
 
-    {"/*safasdfasdfdsafasdfsadfasd*/", TRUE},
-    {"//*safasdf\nasdfdsafasdfsadfasd*/", FALSE},
-    {"( /* ) */", FALSE},
-    {"( /* ) */)", TRUE},
-    {"//asdfasdfasddsaf", FALSE},
-    {"/*aasdfadsfasd*/*/", FALSE}
+    X("\"\"", TRUE),
+    X("\"sadfsad\"asdfsadf\"sdfsad\"", TRUE),
+    X("\"", FALSE),
+    X("\"\"\"", FALSE),
+    X("\"{}", FALSE),
+    X("\"{\"", TRUE),
+    X("{\"(}\"}", TRUE),
+    X("(\"{}\"}", FALSE),
+    X("{\"{\"}\"}\"(\")\")", TRUE),
+    
+    X("/", TRUE),
+    X("//", TRUE),
+    X("///", TRUE),
+    X("////", TRUE),
+    X("//asdf", TRUE),
+    X("//sadfsadfdasasfasdfsdfsdfasdfasdfasdfsdsadfasdfasdfsadfsadfdsafsa\n", TRUE),
+    X("///*asdf*/", TRUE),
+    X("//asd/*f*///*asdfsdfsad*/\n*/", FALSE),
+    X("//asd/*f*///*asdfsdfsad*/\n/*", FALSE),
+    X("/*", FALSE),
+    X("/**/", TRUE),
+    X("*/", FALSE),
+    X("/*asdfasdfasdfsadfsda//asdfdsafds*/", TRUE),
+    X("/*asdfds**/", TRUE),
+    X("/*asdfds*/*/", FALSE),
+    X("/*/*asdfds*/*/", FALSE),
+    X("/*//*/", TRUE)
 
 };
 
-void push(char element, stack_t * stack)
+void Push(char element, stack_t * stack)
 {   
     stack->data[stack->sp] = element;
     stack->sp++;
+    
     return;
 }
-char pop(stack_t * stack)
+char Pop(stack_t * stack)
 {
+    if (stack->sp == 0)
+        return 0;
+
     stack->sp--;
+    
     return stack->data[stack->sp];
 }
 bool Validate(string test)
 {
     stack_t stack = {.sp = 0};
     int i = 0;
-    bool is_comment = FALSE;
-    for(; test[i] != '\0'; i++)
+    
+    bool is_single_comments = FALSE; 
+    bool is_double_comments = FALSE;
+
+    bool is_single_quotes = FALSE; 
+    bool is_double_quotes = FALSE;
+
+    while (test[i] != '\0')
     {
-        if (!is_comment)
+        if (is_single_comments || is_double_comments || is_single_quotes || is_double_quotes)
         {
-            if (test[i] == '[' || test[i] == '{' || test[i] == '(')
+            if (is_single_comments)
             {
-                push(test[i], &stack);
-            }
-            else if (test[i] == ']')
-            {
-                if (stack.sp == 0 || pop(&stack) != '[')
+                if (test[i] == '\n')
                 {
-                    return FALSE;
+                    is_single_comments = FALSE;
                 }
             }
-            else if (test[i] == '}')
+            else if (is_single_quotes)
             {
-                if (stack.sp == 0 || pop(&stack) != '{')
+                if (test[i] == '\'')
                 {
-                    return FALSE;
+                    is_single_quotes = FALSE;
                 }
             }
-            else if (test[i] == ')')
+            else if (is_double_comments)
             {
-                if (stack.sp == 0 || pop(&stack) != '(')
+                if (test[i] == '*' && test[i + 1] == '/')
                 {
-                    return FALSE;
+                    is_double_comments = FALSE;
+                    i++;
                 }
             }
-            else if (test[i] == '/' && test[i + 1] == '*')
+            else if (is_double_quotes)
             {
-                is_comment = TRUE;
-                i++;
+                if (test[i] == '\"')
+                {
+                    is_double_quotes = FALSE;
+                }
+            }
+        }
+        else if (test[i] == ']' || test[i] == '}' || test[i] == ')')
+        {
+            int pop_value = Pop(&stack); 
+            if (test[i] == ']' && pop_value != '[' || test[i] == '}' && pop_value != '{' || test[i] == ')' && pop_value != '(')
+            {
+                return FALSE;
             }
         }
         else
         {
-            if (test[i] == '*' && test[i + 1] == '/')
+            if (test[i] == '/')
             {
-                is_comment = FALSE;
-                i++;
+                if (test[i + 1] == '/')
+                {
+                    is_single_comments = TRUE;
+                    i++;
+                }
+                else if (test[i + 1] == '*')
+                {
+                    is_double_comments = TRUE;
+                    i++;
+                }                
+            }
+            else if (test[i] == '[' || test[i] == '{' || test[i] == '(')
+            {
+                Push(test[i], &stack);
+            }
+            else if (test[i] == '*' && test[i + 1] == '/' && is_double_comments == FALSE)
+            {
+                return FALSE;
+            }
+            else if (test[i] == '\"')
+            {
+                is_double_quotes = TRUE;
+            }
+            else if (test[i] == '\'')
+            {
+                is_single_quotes = TRUE;
             }
         }
+
+        i++;
     }
 
-    if (stack.sp != 0)
+    if (is_double_comments || is_single_quotes || is_double_quotes || stack.sp != 0)
         return FALSE;
+
     return TRUE;
 }
 
@@ -130,12 +209,13 @@ int main()
     {
         if (Validate(test_cases[i].test) == test_cases[i].is_passed)
         {
-            printf("Test #%-2d passed\n", i + 1);
+            printf("Test #%-2d at line %d passed\n", i + 1, test_cases[i].line);
         }
         else
         {
-            printf("Test #%-2d didn't pass\n", i + 1);
-        }
+            printf("Test #%-2d at line %d didn't pass: %s\n", i + 1, test_cases[i].line, test_cases[i].test);
+        }   
     }
+    
     return 0;
 }

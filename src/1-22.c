@@ -46,22 +46,7 @@ int GetLine(int max)
 }
 void Fold(void)
 {
-    extern char line[], new_line[];
-    int line_ix, new_line_jx = line_ix = INIT;
-    int current_boundary_index = LINE_BOUND;
-    int word_length;
-    while (line[line_ix] != '\0')
-    {  
-        if (line[line_ix] > 32 && line[line_ix] < 127)
-        {
-            word_length = WordLength(line, line_ix);
-            if (word_length + new_line_jx < current_boundary_index)
-            {
-                
-            }
-        }
-    }   
-    new_line[new_line_jx] = '\0';
+    
     return;
 }
 void PrintLine(char line[])
@@ -72,10 +57,4 @@ void PrintLine(char line[])
         putchar(line[ix]);
     }
     return;
-}
-int WordLength(char * line, int position)
-{
-    int word_length = INIT;
-    for(; line[position] > 32 && line[position] < 127; position++, word_length++);
-    return word_length;
 }
