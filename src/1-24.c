@@ -27,6 +27,8 @@ struct stack_t
     int sp;
 };
 
+int error = FALSE;
+
 test_case test_cases[] =
 {
     X("[]", TRUE),
@@ -40,6 +42,9 @@ test_case test_cases[] =
     X(")]", FALSE),
     X("{)", FALSE),
     X("{}", TRUE),
+    X("{{()}}", TRUE),
+    X("{{()}}[]", TRUE),
+    X("{{()}}[]]", FALSE),
     X("()", TRUE),
     X("[[]", FALSE),
     X("([)]", FALSE),
@@ -55,11 +60,13 @@ test_case test_cases[] =
     X("{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}", TRUE),
     X("{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}", TRUE),
     X("{{{{{{{{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}", FALSE),
-   
+    X("{({({({({{[]}})})})})}", TRUE),
+
     X("('(')", TRUE),
+    X("'", FALSE),
+    X("''", TRUE),
     X("(''('')", FALSE),
     X("('\"(\"')", TRUE),
-   
 
     X("\"\"", TRUE),
     X("\"sadfsad\"asdfsadf\"sdfsad\"", TRUE),
@@ -93,6 +100,15 @@ test_case test_cases[] =
 
 void Push(char element, stack_t * stack)
 {   
+    if (stack->sp == STACK_CAPACITY && error == FALSE)
+    {
+        printf("-----------------------------------------------------\n");
+        printf("ERROR: Stack is overflowed\n");
+        error = TRUE;
+        return;
+    }
+
+
     stack->data[stack->sp] = element;
     stack->sp++;
     
@@ -111,6 +127,8 @@ bool Validate(string test)
 {
     stack_t stack = {.sp = 0};
     int i = 0;
+
+    error = FALSE;
     
     bool is_single_comments = FALSE; 
     bool is_double_comments = FALSE;
@@ -193,6 +211,9 @@ bool Validate(string test)
             }
         }
 
+        if (error)
+            return FALSE;
+
         i++;
     }
 
@@ -207,7 +228,7 @@ int main()
     int i = 0;
     for (; i < sizeof(test_cases) / sizeof(test_case); i++)
     {
-        if (Validate(test_cases[i].test) == test_cases[i].is_passed)
+        if (Validate(test_cases[i].test) == test_cases[i].is_passed && !error)
         {
             printf("Test #%-2d at line %d passed\n", i + 1, test_cases[i].line);
         }
@@ -215,6 +236,8 @@ int main()
         {
             printf("Test #%-2d at line %d didn't pass: %s\n", i + 1, test_cases[i].line, test_cases[i].test);
         }   
+        if (error)
+            printf("-----------------------------------------------------\n");
     }
     
     return 0;
