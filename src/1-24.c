@@ -4,6 +4,7 @@ double, escape sequences, and comments. (This program is hard if you do it in fu
 generality.) */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define FALSE   0
 #define TRUE    1
@@ -26,8 +27,6 @@ struct stack_t
     char data[STACK_CAPACITY];
     int sp;
 };
-
-int error = FALSE;
 
 test_case test_cases[] =
 {
@@ -98,44 +97,38 @@ test_case test_cases[] =
 
 };
 
+void Panic(char * str)
+{
+    printf("%s\n", str);
+    exit(1);
+}
+
 void Push(char element, stack_t * stack)
 {   
-    if (stack->sp == STACK_CAPACITY && error == FALSE)
+    if (stack->sp == STACK_CAPACITY)
     {
-        printf("-----------------------------------------------------\n");
-        printf("ERROR: Stack is overflowed\n");
-        error = TRUE;
+        Panic("Stack is overflowed");
         return;
     }
-
-
     stack->data[stack->sp] = element;
     stack->sp++;
-    
     return;
 }
 char Pop(stack_t * stack)
 {
     if (stack->sp == 0)
         return 0;
-
     stack->sp--;
-    
     return stack->data[stack->sp];
 }
 bool Validate(string test)
 {
     stack_t stack = {.sp = 0};
     int i = 0;
-
-    error = FALSE;
-    
     bool is_single_comments = FALSE; 
     bool is_double_comments = FALSE;
-
     bool is_single_quotes = FALSE; 
     bool is_double_quotes = FALSE;
-
     while (test[i] != '\0')
     {
         if (is_single_comments || is_double_comments || is_single_quotes || is_double_quotes)
@@ -210,35 +203,30 @@ bool Validate(string test)
                 is_single_quotes = TRUE;
             }
         }
-
-        if (error)
-            return FALSE;
-
         i++;
     }
-
     if (is_double_comments || is_single_quotes || is_double_quotes || stack.sp != 0)
         return FALSE;
-
     return TRUE;
 }
 
 int main()
 {
     int i = 0;
+    bool all_test_passed = TRUE;
     for (; i < sizeof(test_cases) / sizeof(test_case); i++)
     {
-        if (Validate(test_cases[i].test) == test_cases[i].is_passed && !error)
+        if (Validate(test_cases[i].test) == test_cases[i].is_passed)
         {
             printf("Test #%-2d at line %d passed\n", i + 1, test_cases[i].line);
         }
         else
         {
+            all_test_passed = FALSE;
             printf("Test #%-2d at line %d didn't pass: %s\n", i + 1, test_cases[i].line, test_cases[i].test);
-        }   
-        if (error)
-            printf("-----------------------------------------------------\n");
+        } 
     }
-    
+    if (all_test_passed)
+        printf("All test are passed\n");
     return 0;
 }

@@ -5,6 +5,5 @@
 int main()
 {
     printf("Getchar expr: %d\n", getchar() != EOF);
-    
     return 0;
 }

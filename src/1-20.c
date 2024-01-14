@@ -86,8 +86,7 @@ void PrintLine(char arg[], char print_line[])
         {
             boundary = boundary + TAB;
             putchar('|');
-        } 
-    
+        }
         ix++;
     }
     putchar('\n');

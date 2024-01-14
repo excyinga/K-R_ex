@@ -5,7 +5,6 @@
 
 int main()
 {
-    printf("\\\n");
-    
+    printf("\q");
     return 0;
 }

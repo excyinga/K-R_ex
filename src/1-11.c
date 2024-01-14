@@ -10,7 +10,6 @@ int main()
 {
     char c, _state = OUT;
     int wc = 0;
-    
     while ((c = getchar()) != EOF)
     {
         if (c == ' ' || c == '\n' || c == '\t')
@@ -20,12 +19,9 @@ int main()
         else if (_state == OUT)
         {   
             wc++;
-        
             _state = IN;
         }
     }
-
     printf("wc: %d\n", wc);
-    
     return 0;
 }
