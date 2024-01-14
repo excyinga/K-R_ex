@@ -136,9 +136,12 @@ bool Validate(string test)
         if (is_esq_seq)
         {
             is_esq_seq = FALSE;
-            i++;
         }
-        if (is_single_comments)
+        else if ((is_single_quotes || is_double_quotes) && test[i] == '\\')
+        {
+            is_esq_seq = TRUE;
+        }
+        else if (is_single_comments)
         {
             if (test[i] == '\n')
             {
@@ -147,11 +150,7 @@ bool Validate(string test)
         }
         else if (is_single_quotes)
         {
-            if (test[i] == '\\')
-            {
-                is_esq_seq = TRUE;
-            }
-            else if (test[i] == '\'')
+            if (test[i] == '\'')
             {
                 is_single_quotes = FALSE;
             }    
@@ -166,10 +165,6 @@ bool Validate(string test)
         }
         else if (is_double_quotes)
         {
-            if (test[i] == '\\')
-            {
-                is_esq_seq = TRUE;
-            }
             if (test[i] == '\"')
             {
                 is_double_quotes = FALSE;
