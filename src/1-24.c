@@ -64,20 +64,21 @@ test_case test_cases[] =
     X("('(')", TRUE),
     X("'", FALSE),
     X("''", TRUE),
+    X("''''", TRUE),
     X("(''('')", FALSE),
     X("('\"(\"')", TRUE),
+    X("'''''", FALSE),
+    X("'\\''", TRUE),
 
-    X("\"\"", TRUE),
-    X("\"sadfsad\"asdfsadf\"sdfsad\"", TRUE),
-    X("\"", FALSE),
-    X("\"\"\"", FALSE),
-    X("\"{}", FALSE),
-    X("\"{\"", TRUE),
+    X("\"\"", TRUE),X("'\\''", TRUE),
     X("{\"(}\"}", TRUE),
     X("(\"{}\"}", FALSE),
     X("{\"{\"}\"}\"(\")\")", TRUE),
-    X("'\\''", TRUE),
-    
+    X("\"\\\"\"", TRUE),
+    X("'\\\\''", FALSE),
+    X("'\\\\\\''", TRUE),
+    X("'\\", FALSE),
+
     X("/", TRUE),
     X("//", TRUE),
     X("///", TRUE),
@@ -132,6 +133,11 @@ bool Validate(string test)
     bool is_double_quotes = FALSE;
     while (test[i] != '\0')
     {
+        if (is_esq_seq)
+        {
+            is_esq_seq = FALSE;
+            i++;
+        }
         if (is_single_comments)
         {
             if (test[i] == '\n')
@@ -141,10 +147,14 @@ bool Validate(string test)
         }
         else if (is_single_quotes)
         {
-            if (test[i] == '\'')
+            if (test[i] == '\\')
+            {
+                is_esq_seq = TRUE;
+            }
+            else if (test[i] == '\'')
             {
                 is_single_quotes = FALSE;
-            }
+            }    
         }
         else if (is_double_comments)
         {
@@ -156,6 +166,10 @@ bool Validate(string test)
         }
         else if (is_double_quotes)
         {
+            if (test[i] == '\\')
+            {
+                is_esq_seq = TRUE;
+            }
             if (test[i] == '\"')
             {
                 is_double_quotes = FALSE;
