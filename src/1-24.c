@@ -76,6 +76,7 @@ test_case test_cases[] =
     X("{\"(}\"}", TRUE),
     X("(\"{}\"}", FALSE),
     X("{\"{\"}\"}\"(\")\")", TRUE),
+    X("'\\''", TRUE),
     
     X("/", TRUE),
     X("//", TRUE),
@@ -102,7 +103,6 @@ void Panic(char * str)
     printf("%s\n", str);
     exit(1);
 }
-
 void Push(char element, stack_t * stack)
 {   
     if (stack->sp == STACK_CAPACITY)
@@ -125,42 +125,40 @@ bool Validate(string test)
 {
     stack_t stack = {.sp = 0};
     int i = 0;
+    bool is_esq_seq = FALSE;
     bool is_single_comments = FALSE; 
     bool is_double_comments = FALSE;
     bool is_single_quotes = FALSE; 
     bool is_double_quotes = FALSE;
     while (test[i] != '\0')
     {
-        if (is_single_comments || is_double_comments || is_single_quotes || is_double_quotes)
+        if (is_single_comments)
         {
-            if (is_single_comments)
+            if (test[i] == '\n')
             {
-                if (test[i] == '\n')
-                {
-                    is_single_comments = FALSE;
-                }
+                is_single_comments = FALSE;
             }
-            else if (is_single_quotes)
+        }
+        else if (is_single_quotes)
+        {
+            if (test[i] == '\'')
             {
-                if (test[i] == '\'')
-                {
-                    is_single_quotes = FALSE;
-                }
+                is_single_quotes = FALSE;
             }
-            else if (is_double_comments)
+        }
+        else if (is_double_comments)
+        {
+            if (test[i] == '*' && test[i + 1] == '/')
             {
-                if (test[i] == '*' && test[i + 1] == '/')
-                {
-                    is_double_comments = FALSE;
-                    i++;
-                }
+                is_double_comments = FALSE;
+                i++;
             }
-            else if (is_double_quotes)
+        }
+        else if (is_double_quotes)
+        {
+            if (test[i] == '\"')
             {
-                if (test[i] == '\"')
-                {
-                    is_double_quotes = FALSE;
-                }
+                is_double_quotes = FALSE;
             }
         }
         else if (test[i] == ']' || test[i] == '}' || test[i] == ')')
@@ -171,37 +169,34 @@ bool Validate(string test)
                 return FALSE;
             }
         }
-        else
+        else if (test[i] == '/') 
         {
-            if (test[i] == '/')
+            if (test[i + 1] == '/')
             {
-                if (test[i + 1] == '/')
-                {
-                    is_single_comments = TRUE;
-                    i++;
-                }
-                else if (test[i + 1] == '*')
-                {
-                    is_double_comments = TRUE;
-                    i++;
-                }                
+                is_single_comments = TRUE;
+                i++;
             }
-            else if (test[i] == '[' || test[i] == '{' || test[i] == '(')
+            else if (test[i + 1] == '*')
             {
-                Push(test[i], &stack);
-            }
-            else if (test[i] == '*' && test[i + 1] == '/' && is_double_comments == FALSE)
-            {
-                return FALSE;
-            }
-            else if (test[i] == '\"')
-            {
-                is_double_quotes = TRUE;
-            }
-            else if (test[i] == '\'')
-            {
-                is_single_quotes = TRUE;
-            }
+                is_double_comments = TRUE;
+                i++;
+            }                
+        }
+        else if (test[i] == '[' || test[i] == '{' || test[i] == '(')
+        {
+            Push(test[i], &stack);
+        }
+        else if (test[i] == '*' && test[i + 1] == '/' && is_double_comments == FALSE) /* Prohibit nested block comments */
+        {
+            return FALSE;
+        }
+        else if (test[i] == '\"')
+        {
+            is_double_quotes = TRUE;
+        }
+        else if (test[i] == '\'')
+        {
+            is_single_quotes = TRUE;
         }
         i++;
     }
