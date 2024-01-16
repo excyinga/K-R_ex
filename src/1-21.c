@@ -12,13 +12,14 @@ preference?  */
 #define MAX_LINE 1024
 #define CH_BLANK ' '
 #define CH_TAB '\t'
+#define CH_TAB_STOP '|'
 
 int len = INIT;
 char line[MAX_LINE], new_line[MAX_LINE];
 
 int GetLine(char line[], int max);
 void Entab(void);
-void PrintLine(char arg[], char print_line[]);
+void PrintLine(char print_line[]);
 
 int main()
 {
@@ -27,8 +28,10 @@ int main()
     extern char new_line[];
     while ((len = GetLine(line, MAX_LINE)))
     {
+        printf("Line: ");
         PrintLine(line);
         Entab();
+        printf("New line: ");
         PrintLine(new_line);
     }
     return 0;
@@ -48,22 +51,82 @@ int GetLine(char line[], int max)
 void Entab(void)
 {
     extern char line[], new_line[];
-    int line_ix, new_line_ix = line_ix = INIT;
-    
-    while (line[line_ix] != '\0')
+    int i, j = i = INIT;
+    int current_ch = INIT;
+    while (line[i] != '\0')
     {
-        
-    }
+        if (line[i] == CH_BLANK || line[i] == CH_TAB )
+        {
+            int f_ch = current_ch;
+            for (; line[i] == CH_BLANK || line[i] == CH_TAB; i++)
+            {
+                if (line[i] == CH_TAB || current_ch == TAB - 1)
+                {
+                    new_line[j] = CH_TAB;
+                    j++;
+                    current_ch = f_ch = 0;
+                     
+                }
+                else if (line[i + 1] != CH_BLANK && line[i + 1] != CH_TAB)
+                {
+                    while (f_ch != current_ch + 1)
+                    {
+                        new_line[j] = CH_BLANK;
+                        j++;
+                        f_ch++;
+                    }
+                }
+                else
+                {
+                    current_ch++;
+                }
+            }
+        }
+        else
+        {
+            new_line[j] = line[i];
+            j++;
+            i++;
+        }
 
-    new_line[new_line_ix] = '\0';
+        if (current_ch == TAB - 1)
+        {
+            current_ch = 0;
+        }
+        else
+        {
+            current_ch++;
+        }
+    }
+    new_line[j] = '\0';
     return; 
 }
-void PrintLine(char arg[], char print_line[]);
+void PrintLine(char print_line[])
 { 
-    extern char new_line[];
-    
-
-
+    int ix = 0;
+    int tab_stop = 0;
+    while (print_line[ix] != '\0')
+    {
+        if (print_line[ix] == CH_BLANK)
+        {
+            putchar('B');
+            putchar('L');
+        }
+        else if (print_line[ix] == CH_TAB) 
+        {
+            putchar('T');
+            putchar('B');
+        }
+        else    
+            putchar(print_line[ix]);
+        tab_stop++;
+        if (print_line[ix] == CH_TAB || tab_stop == TAB)
+        {
+            putchar(CH_TAB_STOP);
+            tab_stop = 0;
+        }
+        ix++;
+    }
     putchar('\n');
     return;
 }

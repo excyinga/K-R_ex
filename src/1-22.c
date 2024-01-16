@@ -9,7 +9,7 @@ before the specified column */
 
 #define INIT 0
 #define MAX_LINE 1024
-#define LINE_BOUND 32
+#define LINE_BOUND 16
 #define TAB 8
 #define CH_TAB '\t'
 #define CH_BLANK ' '
@@ -19,9 +19,7 @@ char line[MAX_LINE] = {INIT}, new_line[MAX_LINE * TAB + 32] = {INIT};
 
 int GetLine(int);
 void Fold(void);
-
 void PrintLine(char []);
-int WordLength(char * line, int position);
 
 int main()
 {
@@ -29,7 +27,9 @@ int main()
     int len = INIT;
     while ((len = GetLine(MAX_LINE)) != 0)
     {
+        PrintLine(line);
         Fold();
+        PrintLine(new_line);
     }
     return 0;
 }
@@ -44,9 +44,30 @@ int GetLine(int max)
     line[ix] = '\0';
     return ix;
 }
-void Fold(void)
+void Fold()
 {
-    
+    int i = 0;
+    int j = 0;
+    int last_blank = 0;
+    int boundary = 0;
+    while (line[i] != '\0')
+    {
+        /* Finding last blank ch */
+        for (; boundary < LINE_BOUND && line[i] != '\0'; boundary++, i++)
+        {
+            if (line[i] == ' ' || line[i] == '\t')
+            {
+                last_blank = i ;
+            }
+        }   
+
+        /* Copying */
+        for (; j < i; j++)
+        {
+
+        }
+    }
+    new_line[j] = '\0';
     return;
 }
 void PrintLine(char line[])
@@ -55,6 +76,11 @@ void PrintLine(char line[])
     for (; line[ix] != '\0'; ix++)
     {
         putchar(line[ix]);
+        if (line[ix] == '\n')
+        {
+            putchar('|');
+        }
     }
     return;
 }
+
