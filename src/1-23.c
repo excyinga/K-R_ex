@@ -40,7 +40,6 @@ test_case test_cases[] =
     X("'/*'", "'/*'"),
     X("'/*asdfdsa*/'", "'/*asdfdsa*/'"),
     X("\"//\"", "\"//\"")
-    
 };
 
 string RemoveComments(string current_test)
@@ -152,7 +151,7 @@ int main()
         {
             printf("-----------------------------------------\n");
             all_test_passed = FALSE;
-            printf("Test #%-2d at line %d didn't pass\nTest: %s\nExpected : %s\nResult : %s\n", i + 1, test_cases[i].line, test_cases[i].test, test_cases[i].output, cleared_string);
+            printf("Test #%-2d at line %d isn't pass\nTest: %s\nExpected : %s\nResult : %s\n", i + 1, test_cases[i].line, test_cases[i].test, test_cases[i].output, cleared_string);
             printf("-----------------------------------------\n");
         }
         free(cleared_string);

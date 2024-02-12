@@ -6,9 +6,9 @@ generality.) */
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FALSE   0
-#define TRUE    1
-#define STACK_CAPACITY 64
+#define FALSE           0
+#define TRUE            1
+#define STACK_CAPACITY  64
 #define X(data, is_passed) {__LINE__, data, is_passed}
 
 typedef unsigned char bool;
@@ -227,7 +227,7 @@ int main()
         else
         {
             all_test_passed = FALSE;
-            printf("Test #%-2d at line %d didn't pass: %s\n", i + 1, test_cases[i].line, test_cases[i].test);
+            printf("Test #%-2d at line %d isn't pass: %s\n", i + 1, test_cases[i].line, test_cases[i].test);
         } 
     }
     if (all_test_passed)

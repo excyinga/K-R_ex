@@ -77,9 +77,7 @@ void Entab(void)
                     }
                 }
                 else
-                {
                     current_ch++;
-                }
             }
         }
         else
@@ -90,13 +88,9 @@ void Entab(void)
         }
 
         if (current_ch == TAB - 1)
-        {
             current_ch = 0;
-        }
         else
-        {
             current_ch++;
-        }
     }
     new_line[j] = '\0';
     return; 
