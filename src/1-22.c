@@ -18,7 +18,7 @@ before the specified column */
 #define countof(x) (sizeof(x) / sizeof(x[0]))
 
 typedef unsigned char bool;
-typedef char * string;
+typedef char* string;
 typedef struct test_case test_case;
 
 struct test_case
@@ -28,7 +28,7 @@ struct test_case
     string output;
 };
 
-test_case test_cases[] = 
+test_case test_cases[] =
 {
     X("a", "a"),
     X("This is a line with several words. Thisisalinewithonelongword.", "This is a line with several\nwords.\nThisisalinewithonelongword."),
@@ -42,10 +42,10 @@ test_case test_cases[] =
     X(" 2345678901234567890123456789012", " 2345678901234567890123456789012"),
     X(" 23456789012345678901234567890123", " 2345678901234567890123456789012\n3"),
     X("  3456789 1234567890123456789 123", "  3456789 1234567890123456789\n123"),
-    
+
     X("                                ", "                                "),
     X("                                 ", "                                \n "),
-    
+
     X("123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123",\
 "12345678901234567890123456789012\n\
 34567890123456789012345678901234\n\
@@ -84,12 +84,13 @@ test_case test_cases[] =
     "Lorem Ipsum is simply dummy text\n of the printing and typesetting\n industry. Lorem Ipsum has been\nthe industry's standard dummy\ntext ever since the 1500s."),
 
     X("12345678901234567890123\t9012", "12345678901234567890123\t9012"),
-    X("12345678901234567890123\t\t12", "12345678901234567890123\t\n\t12"),
+    X("12345678901234567890123\t\t12", "12345678901234567890123\t\t\n12"),
     X("a b", "a b"),
 
     X("123456789012345678901234\t1", "123456789012345678901234\t\n1"),
-    /* X("123456789012345678901234\t  12\t", "123456789012345678901234\t  12\n\t"), */
+    X("123456789012345678901234\t  12\t", "123456789012345678901234\t\n  12\t"),
 
+    X("123456789012345678901234\t1", "123456789012345678901234\t\n1"),
 
     X("a\tb", "a\tb"),
 
@@ -122,43 +123,45 @@ int main()
             printf("Test #%-3d at line %d passed\n", i, test_cases[i].line);
         free(output_string);
     }
-    return 0;
+    return 0;   
 }
 string Fold(string test_string)
 {
-    
-        int string_size = 0;
-        for (; test_string[string_size] != '\0'; string_size++);
-        if (string_size > MAX_LINE - 1)
-            Panic(test_string);
-    
+
+    int string_size = 0;
+    for (; test_string[string_size] != '\0'; string_size++);
+    if (string_size > MAX_LINE - 1)
+        Panic(test_string);
     string output_string = NULL;
     output_string = malloc(sizeof(char) * MAX_LINE + MAX_LINE / LINE_BOUND);
     int i, j, k, t = k = j = i = 0;
-    int l_ch = 0, to_border = 0;
-    bool _is_word = FALSE;
-    while (test_string[i] != '\0')
+    int to_border = 0, l_ch = 0;
+    bool _state = FALSE;
+    while (test_string[i] != 0)
     {
-        if ((test_string[i] == CH_BLANK || test_string[i] == CH_TAB) && _is_word)
-            l_ch = i;
-        else if (test_string[i] != CH_BLANK && test_string[i] != CH_TAB) 
-            _is_word = TRUE;
-        if (test_string[i] == CH_TAB)
+        to_border++;
+        if ((test_string[i] == CH_TAB || test_string[i] == CH_BLANK) && _state == TRUE)
         {
-            while (t <= to_border)
-                t += TAB;
-            for (; to_border < t; to_border++);
-        }
-        else 
-            to_border++;
-        if (to_border == LINE_BOUND || test_string[i + 1] == '\0')
-        {
-            if (l_ch <= k || test_string[i + 1] == '\0' || test_string[i + 1] == CH_BLANK || test_string[i + 1] == CH_TAB)
+            if (test_string[i] == CH_TAB)
             {
-                /* if (string_size == 245)
-                printf("I: %d\n", i); */
+                while (t < to_border)
+                    t = t + TAB;
+                for (; to_border < t; to_border++);
                 l_ch = i + 1;
             }
+            else
+            {
+                l_ch = i;
+            }
+        }
+        else
+        {
+            _state = TRUE;
+        }
+        if (to_border == LINE_BOUND || test_string[i + 1] == '\0')
+        {
+            if (l_ch <= k || test_string[i + 1] == '\0' || test_string[i + 1] == CH_TAB || test_string[i + 1] == CH_BLANK || _state == FALSE)
+                l_ch = i + 1;
             for (; k < l_ch; k++, j++)
                 output_string[j] = test_string[k];
             if (test_string[i + 1] != '\0')
@@ -171,10 +174,11 @@ string Fold(string test_string)
                 i = k;
                 k++;
             }
-            to_border = t = 0;
-            _is_word = FALSE;
+            to_border = 0;
+            t = 0;
+            _state = FALSE;
         }
-        i++; 
+        i++;
     }
     output_string[j] = '\0';
     return output_string;
